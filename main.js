@@ -44,9 +44,6 @@ let worker = null;
 window.touch = function() {
     const regex = pattern.innerText.replace(/\n$/m, "");
     const start = input.innerText.replace(/\n$/m, "");
-    inputOutput.innerText = start;
-    resize(inputOutput);
-    errors.textContent = "";
     if (worker) worker.terminate();
     worker = new Worker("dist/bundle.js");
     worker.onmessage = (e) => {
@@ -60,6 +57,13 @@ window.touch = function() {
         }
     };
     worker.postMessage({regex, start});
+    setTimeout(() => {
+        if (!worker.done) {
+            errors.textContent = "";
+            inputOutput.innerText = start;
+            resize(inputOutput);
+        }
+    }, 100);
     setTimeout(() => {
         if (!worker.done) {
             output.textContent = "...";
@@ -93,5 +97,6 @@ function displayDiff(start, diff) {
             break;
         }
     }
+    resize(inputOutput);
     resize(output);
 }
