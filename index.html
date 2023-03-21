@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>regexdiff</title>
+    <link rel="icon" href="favicon.png">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <meta content="website" property="og:type">
+    <meta content="https://regexdiff.com/favicon.png" property="og:image">
+    <meta content="Esolangs" property="og:site_name">
+    <meta content="regexdiff" property="og:title">
+    <meta content="a new way to debug regex" property="og:description">
+    <meta content="https://regexdiff.com/" property="og:url">
+    <script src="main.js" defer></script>
+  </head>
+  <body>
+    <h1>regexdiff</h1>
+    <h2>a new way to debug regex</h2>
+    <div class="area">
+      <div class="label">pattern <span id="errors"></span></div>
+      <div contenteditable class="text" id="pattern" spellcheck="false" onkeydown="stopEnter(event)" onpaste="deNewline(event)" oninput="touch()"></div>
+    </div>
+    <div class="area">
+      <div class="label">input</div>
+      <div contenteditable class="text" id="input" spellcheck="false" oninput="resize(this); touch()"></div>
+    </div>
+    <div class="area">
+      <div class="label">closest match</div>
+      <div class="text" id="input-output" disabled></div>
+      <div class="text" id="output" disabled></div>
+    </div>
+    <div class="area">
+      <footer>by LyricLy - <a href="https://github.com/LyricLy/regexdiff">source</a> - <a href="/about">what is this?</a></footer>
+    </div>
+  </body>
+</html>
