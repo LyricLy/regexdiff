@@ -44,14 +44,13 @@ let worker = null;
 window.touch = function() {
     const regex = pattern.innerText.replace(/\n$/m, "");
     const start = input.innerText.replace(/\n$/m, "");
-    inputOutput.innerText = render(start);
+    inputOutput.innerText = start;
     resize(inputOutput);
-    output.textContent = "...";
-    resize(output);
     errors.textContent = "";
     if (worker) worker.terminate();
     worker = new Worker("dist/bundle.js");
     worker.onmessage = (e) => {
+        worker.done = true;
         if (typeof e.data === "string") {
             errors.textContent = e.data;
             output.textContent = ":(";
@@ -61,6 +60,12 @@ window.touch = function() {
         }
     };
     worker.postMessage({regex, start});
+    setTimeout(() => {
+        if (!worker.done) {
+            output.textContent = "...";
+            resize(output);
+        }
+    }, 500);
 }
 
 function displayDiff(start, diff) {
