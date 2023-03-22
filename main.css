@@ -52,7 +52,6 @@ code, .text {
     padding: 9px;
     border-radius: 4px;
     border: none;
-    height: 22px;
     overflow: hidden;
     resize: none;
     white-space: pre-wrap;
