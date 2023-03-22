@@ -51,7 +51,6 @@ window.touch = function() {
         if (typeof e.data === "string") {
             errors.textContent = e.data;
             output.textContent = ":(";
-            resize(output);
         } else {
             errors.textContent = "";
             displayDiff(start, e.data);
@@ -62,13 +61,11 @@ window.touch = function() {
         if (!worker.done) {
             errors.textContent = "";
             inputOutput.innerText = start;
-            resize(inputOutput);
         }
     }, 100);
     setTimeout(() => {
         if (!worker.done) {
             output.textContent = "...";
-            resize(output);
         }
     }, 500);
 }
@@ -98,6 +95,4 @@ function displayDiff(start, diff) {
             break;
         }
     }
-    resize(inputOutput);
-    resize(output);
 }
