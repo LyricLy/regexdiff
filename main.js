@@ -53,6 +53,7 @@ window.touch = function() {
             output.textContent = ":(";
             resize(output);
         } else {
+            errors.textContent = "";
             displayDiff(start, e.data);
         }
     };
