@@ -73,13 +73,8 @@ code, .text {
     float: right;
 }
 
-.replace, .insert, .delete {
+.insert, .delete {
     font-weight: bold;
-}
-
-.replace {
-    color: #2f4beb;
-    background-color: #a8c8ff;
 }
 
 .insert {

@@ -81,11 +81,6 @@ function displayDiff(start, diff) {
             addSpan(output, start[i], "");
             i++;
             break;
-          case "replace":
-            addSpan(inputOutput, start[i], "replace");
-            addSpan(output, move.what, "replace");
-            i++;
-            break;
           case "delete":
             addSpan(inputOutput, start[i], "delete");
             i++;

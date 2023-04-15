@@ -405,7 +405,7 @@ function improve(table, i, state, entry) {
 
 function maybeInsert(path, stost) {
     const {steps, cost} = stost ?? {steps: [], cost: 0};
-    return path ? {steps: [...steps, {type: "insert", what: path}], cost: cost + path.length} : {steps, cost};
+    return path ? {steps: [...steps, {type: "insert", what: path}], cost: cost + path.length + 1} : {steps, cost};
 }
 
 function diff(dfa, string) {
@@ -419,7 +419,6 @@ function diff(dfa, string) {
                 improve(table, i, target, {steps: [...steps, {type: "delete"}], cost: cost + 1});
                 for (const [k, v] of dfa.edges.get(target)) {
                     if (k === string[i]) improve(table, i, v, {steps: [...steps, {type: "keep"}], cost: cost});
-                    else improve(table, i, v, {steps: [...steps, {type: "replace", what: k}], cost: cost + 1});
                 }
             }
         }
