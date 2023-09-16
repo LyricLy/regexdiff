@@ -45,12 +45,15 @@ function charset(expr, string) {
             addClass(node, s);
             return false;
         },
+        Assertion({node}) {
+            if (node.kind === '\\b') s.add(' ');
+        },
     });
     return s;
 }
 
 function parse(string) {
-    return re.parse(new RegExp([...string].map(x => x.length == 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join(''), 'us')).body;
+    return re.parse(new RegExp([...string].map(x => x.length === 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join(''), 'us')).body;
 }
 
 let id = 0;
@@ -106,7 +109,6 @@ function edge(x, y, at, assert, rev) {
 function toNfa(expr, charset) {
     re.traverse(expr, {
         Char({node}) {
-            if (node.symbol === '\b') throw SyntaxError('Unsupported assertion: \\b')
             node.nfa = nfaClass(node, charset);
         },
         CharacterClass({node}) {
@@ -181,8 +183,26 @@ function toNfa(expr, charset) {
         Assertion({node}) {
             const start = empty();
             const end = empty();
-            const rev = node.kind === 'Lookbehind';
-            if (!rev && node.kind !== 'Lookahead') throw SyntaxError(`Unsupported assertion: ${node.kind}`);
+            let rev;
+            switch (node.kind) {
+              case 'Lookbehind':
+                rev = true;
+                break;
+              case 'Lookahead':
+                rev = false;
+                break;
+              case '^':
+                node.nfa = toNfa(parse("(?<!.)"), charset);
+                return;
+              case '$':
+                node.nfa = toNfa(parse("(?!.)"), charset);
+                return;
+              case '\\b':
+                node.nfa = toNfa(parse(/((?<=\w|(?<!.))(?=\W|(?!.))|(?<=\W|(?<!.))(?=\w|(?!.)))/.source), charset);
+                return;
+              default:
+                throw SyntaxError(`Unsupported assertion: ${node.kind}`);
+            }
             let body;
             if (!node.assertion) {
                 body = compile(parse('.*'), charset);
