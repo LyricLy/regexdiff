@@ -1,4 +1,4 @@
-const re = require('regexp-tree');
+import re from "regexp-tree";
 
 function addClass(expr, s) {
     if (expr.codePoint) {
@@ -455,8 +455,6 @@ function diff(dfa, string) {
     return best.steps;
 }
 
-function diffFor(regex, string) {
+export default function diffFor(regex, string) {
     return diff(compileFor(parse(regex), string), string);
 }
-
-module.exports = diffFor;

@@ -1,4 +1,4 @@
-const diffFor = require("./diff.js");
+import diffFor from "./diff.js";
 
 self.onmessage = function(e) {
     try {

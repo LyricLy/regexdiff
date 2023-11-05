@@ -45,7 +45,7 @@ window.touch = function() {
     const regex = pattern.innerText.replace(/\n$/m, "");
     const start = input.innerText.replace(/\n$/m, "");
     if (worker) worker.terminate();
-    worker = new Worker("dist/bundle.js");
+    worker = new Worker(new URL("worker.js", import.meta.url), {type: "module"});
     worker.onmessage = (e) => {
         worker.done = true;
         if (typeof e.data === "string") {
