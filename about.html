@@ -30,7 +30,7 @@
     exactly, including where it starts and ends. the expression <code>a</code> doesn't match the string <code>ab</code>. for that reason, it always creates
     an impossible expression if you have a lookahead at the end of the expression or a lookbehind at its beginning, because you cannot simultaneously be at the end of the
     match <em>and</em> still have characters remaining.</p>
-    <p>if your issue doesn't involve lookaround (and doesn't contain the empty character class <code>[]</code>) then this error is very likely to be a bug. please report
+    <p>if your pattern doesn't involve lookaround (and doesn't contain the empty character class <code>[]</code>) then this error is very likely to be a bug. please report
     it to me on <a href="https://github.com/LyricLy/regexdiff">GitHub</a>.</p>
     <h1>internals</h1>
     <p>TBA</p>
