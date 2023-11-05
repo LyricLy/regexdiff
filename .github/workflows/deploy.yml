@@ -13,13 +13,14 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v3
-      - name: Install browserify
+      - name: Install deps
         run: |
           npm install -g browserify
+          npm install regexp-tree
       - name: Bundle
         run: |
-          mkdir page
-          browserify worker.js -o page/bundle.js
+          mkdir -p page/dist
+          browserify worker.js -o page/dist/bundle.js
           mv *.html favicon.png main.js main.css page
       - name: Set up Pages
         uses: actions/configure-pages@v2
