@@ -1,17 +1,17 @@
 import re from "regexp-tree";
 
-function addClass(expr, s) {
-    if (expr.codePoint) {
+function addClass(expr, s, negate) {
+    if (!negate && expr.codePoint) {
         s.add(expr.symbol);
         return;
     }
     const r = new RegExp(re.generate(expr), "us");
     for (const c of s) {
-        if (r.test(c)) return;
+        if (r.test(c) != negate) return;
     }
     // be picky
     for (const cand of ["x", "#", "0", " "]) {
-        if (r.test(cand)) {
+        if (r.test(cand) != negate) {
             s.add(cand);
             return;
         }
@@ -19,7 +19,7 @@ function addClass(expr, s) {
     // be less picky
     for (let i = 33; i <= 0xE01EF; i++) {
         const cand = String.fromCodePoint(i);
-        if (r.test(cand) && /\P{C}/u.test(cand)) {
+        if (r.test(cand) != negate && /\P{C}/u.test(cand)) {
             s.add(cand);
             return;
         }
@@ -27,7 +27,7 @@ function addClass(expr, s) {
     // don't be picky
     for (let i = 0; i < 0x10FFFF; i++) {
         const cand = String.fromCodePoint(i);
-        if (r.test(cand)) {
+        if (r.test(cand) != negate) {
             s.add(cand);
             return;
         }
@@ -35,20 +35,30 @@ function addClass(expr, s) {
     // we can give up here since [^\0-\u{10ffff}] is []
 }
 
-function charset(expr, string) {
-    const s = new Set(string);
+function _charset(expr, negate, s) {
     re.traverse(expr, {
         Char({node}) {
-            addClass(node, s);
+            addClass(node, s, negate);
         },
         CharacterClass({node}) {
-            addClass(node, s);
+            addClass(node, s, negate);
             return false;
         },
         Assertion({node}) {
-            if (node.kind === '\\b') s.add(' ');
+            if (node.kind === '\\b') {
+                s.add(' ');
+                s.add('x');
+            } else if (node.negative) {
+                _charset(node.assertion, !negate, s);
+                return false;
+            }
         },
     });
+}
+
+function charset(expr, string) {
+    const s = new Set(string);
+    _charset(expr, false, s);
     return s;
 }
 
