@@ -1,5 +1,5 @@
 body {
-    background-color: #f4ece3;
+    background-color: #faf6f2;
     font-family: Roboto, sans-serif;
     color: #333;
     font-size: 16px;
@@ -34,22 +34,16 @@ h2 {
     margin-bottom: 18px;
 }
 
-code {
-    background-color: #eee;
-    box-shadow: 0px 0px 1px;
-    border-radius: 2px;
-}
-
-code, .text {
+.cm-editor {
     font-family: "Roboto Mono", monospace;
 }
 
-.text {
+.cm-editor {
     background-color: white;
     margin-bottom: 7px;
     width: 100%;
     font-size: 16px;
-    padding: 9px;
+    padding: 4px;
     border-radius: 4px;
     border: none;
     min-height: 22px;
@@ -59,22 +53,13 @@ code, .text {
     box-shadow: 0px 0px 1px;
 }
 
-.text:not([contenteditable]) {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-}
-
-.text:focus {
-    outline: thin solid #32a1ce;
+.cm-focused {
+    outline: thin solid #32a1ce !important;
 }
 
 #errors {
     color: #eb4034;
     float: right;
-}
-
-.insert, .delete {
-    font-weight: bold;
 }
 
 .insert {
@@ -83,6 +68,6 @@ code, .text {
 }
 
 .delete {
-    color: #ab0805;
-    background-color: #ffadb7;
+    color: #c4141a;
+    background-color: rgba(255, 0, 0, 0.2);
 }

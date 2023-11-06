@@ -20,18 +20,14 @@
   <body>
     <h1>regexdiff</h1>
     <h2>a new way to debug regex</h2>
-    <div class="area">
+    <div class="area" id="pattern-parent">
       <div class="label">pattern <span id="errors"></span></div>
-      <div contenteditable class="text" id="pattern" spellcheck="false" onkeydown="stopEnter(event)" onpaste="deNewline(event)" oninput="touch()"></div>
     </div>
-    <div class="area">
+    <div class="area" id="input-parent">
       <div class="label">input</div>
-      <div contenteditable class="text" id="input" spellcheck="false" oninput="resize(this); touch()"></div>
     </div>
-    <div class="area">
+    <div class="area" id="output-parent">
       <div class="label">closest match</div>
-      <div class="text" id="input-output" disabled></div>
-      <div class="text" id="output" disabled></div>
     </div>
     <div class="area">
       <footer>by LyricLy - <a href="https://github.com/LyricLy/regexdiff">source</a> - <a href="/about">what is this?</a></footer>

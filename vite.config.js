@@ -10,5 +10,8 @@ export default defineConfig({
         notfound: resolve(__dirname, '404.html'),
       },
     },
+    modulePrelude: {
+        polyfill: false,
+    },
   },
 });

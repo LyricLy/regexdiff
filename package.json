@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "codemirror": "^6.0.1",
     "regexp-tree": "^0.1.27"
   },
   "devDependencies": {
