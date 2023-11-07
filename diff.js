@@ -76,8 +76,10 @@ function empty() {
 }
 
 function idNfa() {
-    const idNode = empty();
-    return {start: idNode, end: idNode};
+    const start = empty();
+    const end = empty();
+    edge(start, end, undefined, undefined, false);
+    return {start, end};
 }
 
 function nfaClass(expr, charset) {
@@ -342,6 +344,7 @@ function toDfaRev(nfa) {
     while (s.frontier.length) {
         const da = s.frontier.pop();
         const mada = [...da];
+        const madaed = new Set();
         const edge = new Map();
         while (mada.length) {
             const code = mada.pop();
@@ -349,8 +352,9 @@ function toDfaRev(nfa) {
                 dfa.accept.add(joinGet(s, da));
             }
             for (const corn of edges(code, true)) {
-                if (!corn.at) {
+                if (!corn.at && !madaed.has(corn.to)) {
                     mada.push(corn.to);
+                    madaed.add(corn.to);
                 } else {
                     let e = edge.get(corn.at);
                     if (!e) {
@@ -404,7 +408,8 @@ function negate(dfa, charset) {
 }
 
 function compile(expr, charset) {
-    return toDfaRev(dfaToNfa(toDfaRev(intersect(intersect(toNfa(expr, charset), false), true))));
+    const r = toDfaRev(dfaToNfa(toDfaRev(intersect(intersect(toNfa(expr, charset), false), true))));
+    return r;
 }
 
 function compileFor(expr, string, lazy) {
@@ -414,7 +419,6 @@ function compileFor(expr, string, lazy) {
             dfa.edges.get(state).clear();
         }
     }
-    console.log(dfa);
     if (!dfa.accept.size) throw Error("expression cannot match anything. see about page for more info");
     return dfa;
 }
