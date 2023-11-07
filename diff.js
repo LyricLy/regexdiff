@@ -232,6 +232,9 @@ function toNfa(expr, charset) {
             node.nfa = {start, end};
             return false;
         },
+        Backreference() {
+            throw SyntaxError("backreferences are not supported");
+        },
     });
     return expr.nfa;
 }
