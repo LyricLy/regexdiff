@@ -17,21 +17,14 @@
     <p>for example, if you've written a URL regex <code>https://\w+\.\w+</code> and it isn't matching the right strings, you could put <code>http://google.com</code> in
     and regexdiff will tell you that it needs an <code>s</code> to match -- sounds like you forgot a <code>?</code>! it will also tell you that <code>https://www.example.com</code>
     doesn't match because it has too many dotted sections.</p>
-    <p>this tool works with the mathematical kind of regexes. it does not care about capturing groups and it will not "search" the string for a match. either the whole string matches, or none of it does.
-    if you want to match strings that <em>contain</em> an expression, just put <code>.*</code> to either side of it.</p>
-    <p>backreferences and recursion are not supported, but lookahead and lookbehind (both positive and negative) are. however, due to the behaviour
-    mentioned above, your regex will not be able to match anything if you put a lookahead at the end of it. instead of <code>followed by foo: (?=foo)</code>,
-    just write <code>followed by foo: foo</code>. (capturing isn't a thing here!)</p>
+    <p>this tool works with the mathematical kind of regexes. it does not care about capturing groups or laziness qualifiers.</p>
+    <p>backreferences and recursion are not supported, but lookahead and lookbehind (both positive and negative) are. note that if the "anchored" flag is
+    enabled, your regex will not be able to match anything if you put a lookahead at the end of it. instead of <code>followed by foo: (?=foo)</code>,
+    you can just write <code>followed by foo: foo</code>.</p>
     <h1>troubleshooting</h1>
     <p>if the tool complains that your regex "cannot match any strings", it means that its structure is contradictory in such a way that there is no string that matches it.
-    the most common way this will happen is misusing lookaround, like by doing <code>(?=a)b</code>.</p>
-    <p>remember that regexdiff expects the expression to match the whole string
-    exactly, including where it starts and ends. the expression <code>a</code> doesn't match the string <code>ab</code>. for that reason, it always creates
-    an impossible expression if you have a lookahead at the end of the expression or a lookbehind at its beginning, because you cannot simultaneously be at the end of the
-    match <em>and</em> still have characters remaining.</p>
-    <p>if your pattern doesn't involve lookaround (and doesn't contain the empty character class <code>[]</code>) then this error is very likely to be a bug. please report
-    it to me on <a href="https://github.com/LyricLy/regexdiff">GitHub</a>.</p>
-    <h1>internals</h1>
-    <p>TBA</p>
+    one way this might happen is misusing lookaround, like by doing <code>(?=a)b</code>.</p>
+    <p>if the "anchored" flag is enabled, it always creates an impossible expression if you have a lookahead at the end of the expression or a lookbehind at its beginning,
+    because you cannot simultaneously be at the end of the match <em>and</em> still have characters remaining.</p>
   </body>
 </html>

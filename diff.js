@@ -62,8 +62,12 @@ function charset(expr, string) {
     return s;
 }
 
-function parse(string) {
-    return re.parse(new RegExp([...string].map(x => x.length === 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join(''), 'us')).body;
+function parse(string, anchored) {
+    let source = [...string].map(x => x.length === 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join('');
+    // confirm the syntax is valid before changing anything
+    new RegExp(source);
+    if (!anchored) source = `.*${source}.*`;
+    return re.parse(new RegExp(source, 'us')).body;
 }
 
 let id = 0;
@@ -136,12 +140,14 @@ function toNfa(expr, charset) {
             node.nfa = nfa;
         }},
         Disjunction: {post: ({node}) => {
+            const leftNfa = node.left?.nfa ?? idNfa();
+            const rightNfa = node.right?.nfa ?? idNfa();
             const start = empty();
-            edge(start, node.left.nfa.start);
-            edge(start, node.right.nfa.start);
+            edge(start, leftNfa.start);
+            edge(start, rightNfa.start);
             const end = empty();
-            edge(node.left.nfa.end, end);
-            edge(node.right.nfa.end, end);
+            edge(leftNfa.end, end);
+            edge(rightNfa.end, end);
             node.nfa = {start, end};
         }},
         Repetition: {post: ({node}) => {
@@ -398,8 +404,14 @@ function compile(expr, charset) {
     return toDfaRev(dfaToNfa(toDfaRev(intersect(intersect(toNfa(expr, charset), false), true))));
 }
 
-function compileFor(expr, string) {
-    const dfa = compile(expr, charset(expr, string));
+function compileFor(expr, string, lazy) {
+    let dfa = compile(expr, charset(expr, string));
+    if (lazy) {
+        for (const state of dfa.accept) {
+            dfa.edges.get(state).clear();
+        }
+    }
+    console.log(dfa);
     if (!dfa.accept.size) throw Error("expression cannot match anything. see about page for more info");
     return dfa;
 }
@@ -458,13 +470,15 @@ function diff(dfa, string) {
         for (const accepting of dfa.accept) {
             const path = shortest.get(state).get(accepting);
             if (path === undefined) continue;
-            const stost = maybeInsert(path, table.get(key(string.length, state)));
+            const firstLeg = table.get(key(string.length, state));
+            if (firstLeg === undefined && string) continue;
+            const stost = maybeInsert(path, firstLeg);
             if (!best || stost.cost < best.cost) best = stost;
         }
     }
     return best.steps;
 }
 
-export default function diffFor(regex, string) {
-    return diff(compileFor(parse(regex), string), string);
+export default function diffFor({regex, string, anchored, lazy}) {
+    return diff(compileFor(parse(regex, anchored), string, lazy), string);
 }

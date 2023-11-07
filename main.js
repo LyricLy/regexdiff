@@ -44,10 +44,17 @@ const output = new EditorView({
 
 const errors = document.getElementById("errors");
 
+const anchored = document.getElementById("anchored");
+const lazy = document.getElementById("lazy");
+
+for (const elem of [anchored, lazy]) {
+    elem.addEventListener("change", touch);
+}
+
 let worker = null;
 function touch() {
     const regex = pattern.state.doc.toString();
-    const start = input.state.doc.toString();
+    const string = input.state.doc.toString();
     if (worker) worker.terminate();
     worker = new Worker(new URL("worker.js", import.meta.url), {type: "module"});
     worker.onmessage = (e) => {
@@ -57,10 +64,10 @@ function touch() {
             setOutput(":(");
         } else {
             errors.textContent = "";
-            displayDiff(start, e.data);
+            displayDiff(string, e.data);
         }
     };
-    worker.postMessage({regex, start});
+    worker.postMessage({regex, string, anchored: anchored.checked, lazy: lazy.checked});
     setTimeout(() => {
         if (!worker.done) {
             errors.textContent = "";

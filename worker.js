@@ -1,8 +1,8 @@
 import diffFor from "./diff.js";
 
-self.onmessage = function(e) {
+self.onmessage = function({data}) {
     try {
-        postMessage(diffFor(e.data.regex, e.data.start));
+        postMessage(diffFor(data));
     } catch (error) {
         postMessage(error.message);
     }
