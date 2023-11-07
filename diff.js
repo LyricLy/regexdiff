@@ -454,7 +454,7 @@ function improve(table, i, state, entry) {
 
 function maybeInsert(path, stost) {
     const {steps, cost} = stost ?? {steps: [], cost: 0};
-    return path ? {steps: [...steps, {type: "insert", what: path}], cost: cost + path.length + 1} : {steps, cost};
+    return path ? {steps: [...steps, {type: "insert", what: path}], cost: cost + path.length + 0.1} : {steps, cost};
 }
 
 function diff(dfa, string) {
