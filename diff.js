@@ -210,14 +210,14 @@ function toNfa(expr, charset) {
                 rev = false;
                 break;
               case '^':
-                node.nfa = toNfa(parse("(?<!.)"), charset);
-                return;
+                node.nfa = toNfa(parse("(?<!.)", true), charset);
+                return false;
               case '$':
-                node.nfa = toNfa(parse("(?!.)"), charset);
-                return;
+                node.nfa = toNfa(parse("(?!.)", true), charset);
+                return false;
               case '\\b':
-                node.nfa = toNfa(parse(/((?<=\w|(?<!.))(?=\W|(?!.))|(?<=\W|(?<!.))(?=\w|(?!.)))/.source), charset);
-                return;
+                node.nfa = toNfa(parse(/((?<=\w|(?<!.))(?=\W|(?!.))|(?<=\W|(?<!.))(?=\w|(?!.)))/.source, true), charset);
+                return false;
               default:
                 throw SyntaxError(`Unsupported assertion: ${node.kind}`);
             }
@@ -352,9 +352,11 @@ function toDfaRev(nfa) {
                 dfa.accept.add(joinGet(s, da));
             }
             for (const corn of edges(code, true)) {
-                if (!corn.at && !madaed.has(corn.to)) {
-                    mada.push(corn.to);
-                    madaed.add(corn.to);
+                if (!corn.at) {
+                    if (!madaed.has(corn.to)) {
+                        mada.push(corn.to);
+                        madaed.add(corn.to);
+                    }
                 } else {
                     let e = edge.get(corn.at);
                     if (!e) {
