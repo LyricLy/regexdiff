@@ -62,10 +62,14 @@ function charset(expr, string) {
     return s;
 }
 
-function parse(string, anchored) {
+function parse(string, anchored, cg) {
+    if (cg) {
+        string = string.replace(/(?<=(?<!\\)(?:\\\\)*)([?+^${}])/ug, "\\$1").replace(/\\([^^$?+*|[\]{}()\\])/ug, "$1");
+        if (/(?<!\\)(?:\\\\)*\[[^\]]/u.test(string)) throw SyntaxError("character classes must be empty");
+    }
     let source = [...string].map(x => x.length === 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join('');
     // confirm the syntax is valid before changing anything
-    new RegExp(source);
+    new RegExp(source, 'u');
     if (!anchored) source = `.*${source}.*`;
     return re.parse(new RegExp(source, 'us')).body;
 }
@@ -125,6 +129,7 @@ function edge(x, y, at, assert, rev) {
 function toNfa(expr, charset) {
     re.traverse(expr, {
         Char({node}) {
+            console.log(node);
             node.nfa = nfaClass(node, charset);
         },
         CharacterClass({node}) {
@@ -488,6 +493,6 @@ function diff(dfa, string) {
     return best.steps;
 }
 
-export default function diffFor({regex, string, anchored, lazy}) {
-    return diff(compileFor(parse(regex, anchored), string, lazy), string);
+export default function diffFor({regex, string, anchored, lazy, cg}) {
+    return diff(compileFor(parse(regex, anchored, cg), string, lazy), string);
 }

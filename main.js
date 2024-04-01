@@ -46,6 +46,15 @@ const errors = document.getElementById("errors");
 
 const anchored = document.getElementById("anchored");
 const lazy = document.getElementById("lazy");
+const cg = window.location.search === "?cg";
+
+if (cg) {
+    patternParent.insertAdjacentHTML("beforebegin", "welcome from code guessing! you can edit the url to remove this state");
+    for (let i = 0; i < 5; i++) anchored.nextSibling.nextSibling.remove();
+    anchored.remove();
+    inputParent.remove();
+    outputParent.children[0].innerHTML = "result";
+}
 
 for (const elem of [anchored, lazy]) {
     elem.addEventListener("change", touch);
@@ -67,7 +76,7 @@ function touch() {
             displayDiff(string, e.data);
         }
     };
-    worker.postMessage({regex, string, anchored: anchored.checked, lazy: lazy.checked});
+    worker.postMessage({regex, string, anchored: anchored.checked, lazy: lazy.checked, cg});
     setTimeout(() => {
         if (!worker.done) {
             errors.textContent = "";
