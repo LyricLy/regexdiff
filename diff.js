@@ -64,7 +64,7 @@ function charset(expr, string) {
 
 function parse(string, anchored, cg) {
     if (cg) {
-        string = string.replace(/(?<=(?<!\\)(?:\\\\)*)([?+^${}])/ug, "\\$1").replace(/\\([^^$?+*|[\]{}()\\])/ug, "$1");
+        string = string.replace(/(?<=(?<!\\)(?:\\\\)*)([?+^${}])/ug, "\\$1").replace(/(?<=(?<!\\)(?:\\\\)*)\\([^^$?+*|[\]{}()\\])/ug, "$1");
         if (/(?<!\\)(?:\\\\)*\[[^\]]/u.test(string)) throw SyntaxError("character classes must be empty");
     }
     let source = [...string].map(x => x.length === 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join('');
