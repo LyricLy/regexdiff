@@ -1,14 +1,26 @@
 import re from "regexp-tree";
 
+// this is a lazy way of finding a character that a character class matches
+// by simply checking it against every character. it would be more efficient
+// to parse the class properly, but this is easier than dealing with the various
+// kinds of cases that Unicode-aware character classes can have and it's fast
+// enough, so this is what we have.
 function addClass(expr, s, negate) {
     if (!negate && expr.codePoint) {
         s.add(expr.symbol);
         return;
     }
+
+    // don't waste time if it trivially doesn't match anything
+    if (re.generate(expr) === "[]") return;
+
     const r = new RegExp(re.generate(expr), "us");
+
+    // or if it already matches something in the current charset
     for (const c of s) {
         if (r.test(c) != negate) return;
     }
+
     // be picky
     for (const cand of ["x", "#", "0", " "]) {
         if (r.test(cand) != negate) {
@@ -129,7 +141,6 @@ function edge(x, y, at, assert, rev) {
 function toNfa(expr, charset) {
     re.traverse(expr, {
         Char({node}) {
-            console.log(node);
             node.nfa = nfaClass(node, charset);
         },
         CharacterClass({node}) {
