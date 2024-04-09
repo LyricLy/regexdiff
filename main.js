@@ -52,7 +52,7 @@ if (cg) {
     patternParent.insertAdjacentHTML("beforebegin", "welcome from code guessing! you can edit the url to remove this state");
     for (let i = 0; i < 5; i++) anchored.nextSibling.nextSibling.remove();
     anchored.remove();
-    inputParent.remove();
+    inputParent.children[0].innerHTML = "starting point (leave empty for cg-accurate answer)";
     outputParent.children[0].innerHTML = "result";
 }
 
