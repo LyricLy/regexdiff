@@ -81,7 +81,12 @@ function parse(string, anchored, cg) {
     }
     let source = [...string].map(x => x.length === 1 ? x : `\\u{${x.codePointAt(0).toString(16)}}`).join('');
     // confirm the syntax is valid before changing anything
-    new RegExp(source, 'u');
+    // this needs to be put in an explicit try block to prevent rollup from deleting it
+    try {
+        new RegExp(source, 'u');
+    } catch (e) {
+        throw e;
+    }
     if (!anchored) source = `.*(${source}).*`;
     return re.parse(new RegExp(source, 'us')).body;
 }
