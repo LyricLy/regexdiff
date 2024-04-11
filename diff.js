@@ -426,8 +426,7 @@ function negate(dfa, charset) {
 }
 
 function compile(expr, charset) {
-    const r = toDfaRev(dfaToNfa(toDfaRev(intersect(intersect(toNfa(expr, charset), false), true))));
-    return r;
+    return toDfaRev(dfaToNfa(toDfaRev(intersect(intersect(toNfa(expr, charset), false), true))));
 }
 
 function compileFor(expr, string, lazy) {
@@ -464,42 +463,52 @@ function allPairsShortestPath(edges) {
     return paths;
 }
 
-function improve(table, i, state, entry) {
-    const k = key(i+1, state);
-    const current = table.get(k);
-    if (!current || current.cost > entry.cost) table.set(k, entry);
+function improve(stostMap, state, stost) {
+    const old = stostMap.get(state);
+    if (old === undefined || old.cost >= stost.cost) stostMap.set(state, stost); 
 }
 
-function maybeInsert(path, stost) {
-    const {steps, cost} = stost ?? {steps: [], cost: 0};
-    return path ? {steps: [...steps, {type: "insert", what: path}], cost: cost + path.length + 0.1} : {steps, cost};
+function doInsertions(stostMap, shortest) {
+    for (const [state, {steps, cost}] of stostMap.entries()) {
+        for (const [target, path] of shortest.get(state).entries()) {
+            improve(stostMap, target, {steps: [...steps, {type: "insert", what: path}], cost: cost + path.length + 0.1});
+        }
+    }
 }
 
 function diff(dfa, string) {
     const shortest = allPairsShortestPath(dfa.edges);
-    const table = new Map();
-    for (let i = 0; i < string.length; i++) {
-        for (const state of i === 0 ? [dfa.initial] : dfa.edges.keys()) {
-            const stost = table.get(key(i, state));
-            for (const [target, path] of shortest.get(state)) {
-                const {steps, cost} = maybeInsert(path, stost);
-                improve(table, i, target, {steps: [...steps, {type: "delete"}], cost: cost + 1});
-                for (const [k, v] of dfa.edges.get(target)) {
-                    if (k === string[i]) improve(table, i, v, {steps: [...steps, {type: "keep"}], cost: cost});
-                }
-            }
+    let stostMap = new Map();
+
+    // to begin with, we can reach the initial state at no cost, or insert characters to reach any reachable state
+    stostMap.set(dfa.initial, {steps: [], cost: 0});
+    doInsertions(stostMap, shortest);
+
+    for (const c of string) {
+        const nextMap = new Map();
+
+        // for each state we might be in...
+        for (const [state, {steps, cost}] of stostMap.entries()) {
+            // we can always ignore the current character for a cost of 1
+            improve(nextMap, state, {steps: [...steps, {type: "delete"}], cost: cost + 1});
+
+            // or we can keep it and see where it goes for free
+            const nextState = dfa.edges.get(state).get(c);
+            if (nextState !== undefined) improve(nextMap, nextState, {steps: [...steps, {type: "keep"}], cost});
         }
+
+        // finally, for each state we could be, we can choose to stay in that state or insert characters to reach a different state
+        doInsertions(nextMap, shortest);
+        stostMap = nextMap;
     }
+
+    // the answer is the best path that ends on an accepting state
     let best = null;
-    for (const state of !string ? [dfa.initial] : dfa.edges.keys()) {
-        for (const accepting of dfa.accept) {
-            const path = shortest.get(state).get(accepting);
-            if (path === undefined) continue;
-            const firstLeg = table.get(key(string.length, state));
-            if (firstLeg === undefined && string) continue;
-            const stost = maybeInsert(path, firstLeg);
-            if (!best || stost.cost < best.cost) best = stost;
-        }
+    for (const state of dfa.accept) {
+        const stost = stostMap.get(state);
+        // the state not being in the map means it's unreachable, which is sometimes possible with the lazy flag
+        if (!stost) continue;
+        if (!best || stost.cost < best.cost) best = stost;
     }
     return best.steps;
 }
