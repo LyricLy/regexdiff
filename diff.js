@@ -244,7 +244,7 @@ function toNfa(expr, charset) {
                 body = toDfaRev(dfaToNfa(compile({type: 'Alternative', expressions: [parse('.*'), node.assertion]}, charset)));
             } else {
                 body = compile({type: 'Alternative', expressions: [node.assertion, parse('.*')]}, charset);
-            };
+            }
             if (node.negative) body = negate(body, charset);
             edge(start, end, undefined, {rev, body});
             node.nfa = {start, end};
